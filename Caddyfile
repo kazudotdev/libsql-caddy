@@ -1,0 +1,15 @@
+admin.example.localhost:80 {
+  reverse_proxy sqld-primary:8001
+}
+
+example.localhost:80 {
+  reverse_proxy sqld-primary:8000
+  log {
+      output stdout
+      level DEBUG
+  }
+}
+
+*.example.localhost:80 {
+  reverse_proxy sqld-primary:8000
+}

@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  proxy:
+    image: caddy:2-alpine
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - no_proxy=sqld-primary
+      - NO_PROXY=sqld-primary
+    networks:
+      - internal
+      - external
+  sqld-primary:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    platform: linux/amd64
+    environment:
+      - SQLD_NODE=primary
+      - SQLD_HTTP_LISTEN_ADDR=0.0.0.0:8000
+      - SQLD_ADMIN_LISTEN_ADDR=0.0.0.0:8001
+    expose:
+      - 8001
+      - 8000
+    networks:
+      - internal
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:
+    internal: true
+  external:
+    name: databas_network
